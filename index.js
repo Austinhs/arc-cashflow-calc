@@ -17,8 +17,8 @@ platform.addEventListener('change', platform_change);
 product.addEventListener('change', product_change);
 
 // TODO: Remove as this is for debugging purposes
-initial_inventory_amount.value = 15000;
-run_report();
+// initial_inventory_amount.value = 15000;
+// run_report();
 
 function platform_change() {
     const selected_platform = platform.value;
