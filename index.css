@@ -6,6 +6,10 @@
     display: none;
 }
 
+.report-results {
+    margin-bottom: 24px;
+}
+
 .gridjs-th-content {
     text-overflow: initial !important;
 }

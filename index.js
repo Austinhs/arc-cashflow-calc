@@ -15,6 +15,11 @@ let   product                    = document.querySelector('.product.active');
 run_button.addEventListener('click', run_report);
 platform.addEventListener('change', platform_change);
 product.addEventListener('change', product_change);
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') {
+        run_report();
+    }
+})
 
 // TODO: Remove as this is for debugging purposes
 // initial_inventory_amount.value = 15000;
@@ -60,6 +65,7 @@ function run_report() {
 
     if(inventory_amount <= 0) {
         initial_inventory_amount.classList.add('has-error');
+        initial_inventory_amount.focus();
         alert('Initial inventory amount is required before you can calculate the report.');
         return;
     } else {
