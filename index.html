@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+    <head>
+        <title>Cashflow Calculator</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <link rel="stylesheet" href="./index.css">
+    </head>
+
+    <body>
+        <section class="section">
+            <h1 class="title">Inputs</h1>
+            <article class="message">
+                <div class="message-header">Settings</div>
+                <div class="message-body">
+                    <div class="calc-inputs grid">
+                        <div class="cell grid">
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Platform <span class="required-astrik">*</span></label>
+                                <div class="select">
+                                    <select class="platform">
+                                        <option value="Amazon" selected>Amazon</option>
+                                        <option value="Walmart">Walmart</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Product <span class="required-astrik">*</span></label>
+                                <div class="select">
+                                    <select class="product-amazon product active">
+                                        <option value="35000" selected>$35k - 70/30 profit split</option>
+                                        <option value="45000">$45k - 70/25 profit split</option>
+                                    </select>
+                                    <select class="product-walmart product">
+                                        <option value="25000">$25k - 70/30 profit split</option>
+                                        <option value="35000">$35k - 70/25 profit split</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Initial inventory amount <span class="required-astrik">*</span></label>
+                                <input type="number" class="initial-inventory-amount input" placeholder="10000">
+                            </div>
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Target Gross Profit Margin</label>
+                                <div class="select">
+                                    <select class="margin">
+                                        <option>N/A</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="25">25</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Secondary inventory amount</label>
+                                <input type="number" class="secondary-inventory-amount input" placeholder="10000">
+                            </div>
+                            <div class="cell field is-col-span-2">
+                                <label class="label">Secondary Float Month Start</label>
+                                <div class="select">
+                                    <select class="month-start">
+                                        <option value="">N/A</option>
+                                        <option value="6">Month 6</option>
+                                        <option value="7">Month 7</option>
+                                        <option value="8">Month 8</option>
+                                        <option value="9">Month 9</option>
+                                        <option value="10">Month 10</option>
+                                        <option value="11">Month 11</option>
+                                        <option value="12">Month 12</option>
+                                        <option value="13">Month 13</option>
+                                        <option value="14">Month 14</option>
+                                        <option value="15">Month 15</option>
+                                        <option value="16">Month 16</option>
+                                        <option value="17">Month 17</option>
+                                        <option value="18">Month 18</option>
+                                        <option value="19">Month 19</option>
+                                        <option value="20">Month 20</option>
+                                        <option value="21">Month 21</option>
+                                        <option value="22">Month 22</option>
+                                        <option value="23">Month 23</option>
+                                        <option value="24">Month 24</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="run-report button">Run report</button>
+                        <span>Profit split: <strong class="profit-split">70/30</strong></span>
+                    </div>
+                </div>
+            </article>
+
+            <div class="report-results active">
+                <article class="message">
+                    <div class="message-header">Single Inventory Sequence</div>
+                    <div class="message-body">
+                        <div class="summary-table">
+                            <div class="summary-row">
+                                <div class="summary-headers">Sales</div>
+                                <div class="summary-values right-align" data-field="sales"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Inventory Costs</div>
+                                <div class="summary-values right-align" data-field="inventory_costs"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Platform Fees</div>
+                                <div class="summary-values right-align" data-field="platform_fees"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Operating Expenses</div>
+                                <div class="summary-values right-align" data-field="operating_expenses"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Gross Profit</div>
+                                <div class="summary-values right-align" data-field="gross_profit"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Profit Split</div>
+                                <div class="summary-values right-align" data-field="profit_split"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Net Profit</div>
+                                <div class="summary-values right-align" data-field="net_profit"></div>
+                            </div>
+                            <div class="summary-row">
+                                <div class="summary-headers">Next Inventory Order</div>
+                                <div class="summary-values right-align" data-field="next_inventory_order"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <hr>
+                    <div>
+                        <h1 class="title">24-month Forecast</h1>
+                        <div id="forecast-table"></div>
+                    </div>
+            </div>
+
+            <article class="message">
+                <div class="message-header">Case studies</div>
+                <div class="message-body">
+                    <div>{Insert 4 rotating examples here}</div>
+                </div>
+            </article>
+
+            <article class="message is-warning">
+                <div class="message-header">Disclaimer</div>
+                <div class="message-body">
+                    Investing of any kind carries risk and it is possible to lose some or all of your money. The services provided have inherent risks around the platform and products. We make no representation regarding the likelihood or probability that any actual or hypothetical investment will achieve a particular outcome or perform in any predictable manner. 
+                    Statements and depictions are the opinions, findings, or experiences of individuals who generally have purchased the program. Results vary, are not typical, and rely on individual effort, capital, as well as unknown conditions, and other factors. We do not solely measure earnings or financial performance. We track completed transactions and satisfaction of services through voluntary surveys. You should not, however, equate reported sales transactions with financially successful transactions. Further clients that do not continue with the program, or attempt to do what's required to continue to have operations continue for their store hardly see results.
+                    The Company may link to content or refer to content and/or services created by or provided by third parties that are not affiliated with the Company. The Company is not responsible for such content and does not endorse or approve it. The Company may provide services by or refer you to third-party businesses. Some of these businesses have common interests and ownership with the Company. 
+                </div>
+            </article>
+        </section>
+    </body>
+
+    <script src="./index.js"></script>
+</html>

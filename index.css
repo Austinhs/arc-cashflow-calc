@@ -1,0 +1,89 @@
+.product:not(.active) {
+    display: none;
+}
+
+.report-results:not(.active) {
+    display: none;
+}
+
+.gridjs-th-content {
+    text-overflow: initial !important;
+}
+
+.summary-table {
+    display: grid;
+    grid-template-rows: auto;
+    margin-top: 20px;
+    color: #fff;
+    background-color: rgb(51, 55, 64);
+}
+
+.summary-row {
+    border: 1px solid black;;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.summary-row div {
+    padding: 10px;
+    width: auto;
+}
+
+.summary-headers {
+    font-weight: bold;
+    border-right: 1px solid black;
+}
+
+.summary-values {
+    width: 20px;
+}
+
+.required-astrik {
+    color: red;
+}
+
+.has-error {
+    background: pink;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.run-report {
+    margin-right: 15px;
+}
+
+/* Bulma styling */
+.select {
+    width: 100%;
+}
+.select select {
+    width: 100%;
+}
+
+/*  Use Sequence.algoalpha.co css */
+:root {
+    --bulma-link: #fe9716;
+}
+
+.message.is-warning > .message-header,
+.button {
+    background-color: #fe9716;
+}
+
+.title {
+    padding-bottom: 16px;
+}
+
+#inputStartingLots {
+    width: 96px;
+}
+
+.checkbox {
+    padding-bottom: 24px;
+}
+
+#forecast-table {
+    padding-bottom: 24px;
+}
