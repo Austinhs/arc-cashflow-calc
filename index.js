@@ -45,11 +45,10 @@ const gridjs_styles = {
 };
 
 // TODO: Remove as this is for debugging purposes
-// initial_inventory_amount.value = 15000;
-// secondary_inventory_amount.value = 5000;
-// month_start.value = 12;
-// run_report();
-// window.scrollTo(0, document.body.scrollHeight);
+initial_inventory_amount.value = 15000;
+month_start.value = 12;
+run_report();
+window.scrollTo(0, document.body.scrollHeight);
 
 function platform_change() {
     const selected_platform = platform.value;
@@ -333,8 +332,8 @@ function calcSummaryTable() {
     }
 
     table_columns.push("Worst", "Best");
-    const calc_worst_data = calc_profit_from(data, 0.1);
-    const calc_best_data = calc_profit_from(data, 0.25);
+    const calc_worst_data = calc_profit_from(0.05);
+    const calc_best_data = calc_profit_from(0.25);
     for(const idx in data_array) {
         const key = data_array[idx][0];
         data_array[idx].push(calc_worst_data[key]);
@@ -364,6 +363,7 @@ function calc_profit_from_revenue(revenue) {
         "Operating Expenses"   : USDollar.format(operating_expenses),
         "Profit Split"         : USDollar.format(profit_split),
         "Net Profit"           : USDollar.format(net_profit),
+        "Net Profit %"         : `${(net_profit / revenue * 100).toFixed(2)}%`,
         "Next Inventory Purchase (if net profits were rolled into next purchase)" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
     };
 }
@@ -372,12 +372,27 @@ function convertDollarToNumber(dollar) {
     return parseFloat(dollar.replace(/[^0-9.-]+/g,""));
 }
 
-function calc_profit_from(prev_results, new_profit_percent) {
-    const prev_cost = convertDollarToNumber(prev_results["Profit Split"]) + convertDollarToNumber(prev_results["Operating Expenses"]);
-    const prev_revenue = convertDollarToNumber(prev_results["Revenue"]);
-    const prev_net_profit_percent = convertDollarToNumber(prev_results["Net Profit"]) / prev_revenue;
-    const prev_investment = Number(initial_inventory_amount.value);
-    const new_revenue = (prev_cost + prev_investment) / (1 - prev_net_profit_percent - new_profit_percent);
 
-    return { "Revenue": USDollar.format(new_revenue), ...calc_profit_from_revenue(new_revenue) };
+function calc_profit_from(desired_profit_percent) {
+    const investment = Number(initial_inventory_amount.value);
+    let low = investment;  // Minimum possible revenue
+    let high = investment * 100;  // A reasonably high upper bound
+    const epsilon = 0.0001;  // Desired precision
+
+    while (high - low > epsilon) {
+        let mid = (low + high) / 2;
+        let result = calc_profit_from_revenue(mid);
+        let current_profit_percent = parseFloat(result["Net Profit %"]) / 100;
+
+        if (Math.abs(current_profit_percent - desired_profit_percent) < epsilon) {
+            return {"Revenue": USDollar.format(mid), ...result};
+        } else if (current_profit_percent < desired_profit_percent) {
+            low = mid;  // The correct revenue is higher
+        } else {
+            high = mid;  // The correct revenue is lower
+        }
+    }
+
+    // If we exit the loop, we return the result for the midpoint
+    return {"Revenue": USDollar.format(low+high), ...calc_profit_from_revenue((low + high) / 2)};
 }
