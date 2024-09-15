@@ -145,7 +145,7 @@ function calcForecastTable() {
                 break;
         }
 
-        if(month == month_start.value) {
+        if(month >= month_start.value) {
             m_cogs += Number(secondary_inventory_amount.value);
         }
 
