@@ -6,6 +6,14 @@
     display: none;
 }
 
+.amazon:not(.active) {
+    display: none;
+}
+
+.walmart:not(.active) {
+    display: none;
+}
+
 .report-results {
     margin-bottom: 24px;
 }

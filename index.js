@@ -71,6 +71,14 @@ function product_change() {
     const selected_platform = platform.value;
     const selected_product = product.value;
 
+    if(selected_platform == "Amazon") {
+        document.querySelector('.amazon').classList.add('active');
+        document.querySelector('.walmart').classList.remove('active');
+    } else {
+        document.querySelector('.walmart').classList.add('active');
+        document.querySelector('.amazon').classList.remove('active');
+    }
+
     if(selected_platform == "Amazon" && selected_product == "45000") {
         profit_split.innerHTML = "70/25";
     } else if(selected_platform == "Amazon") {
