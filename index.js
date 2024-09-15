@@ -322,7 +322,7 @@ function calcSummaryTable() {
         }
     } else {
         table_columns.push("Month 0", "Month 1");
-        data_array = [["Upfront Inventory Investment"], ...data_array]
+        data_array = [["Upfront Inventory"], ...data_array]
         data_array[0].push(USDollar.format(initial_inventory_amount.value));
         for(const idx in data_array) {
             const key = data_array[idx][0];
