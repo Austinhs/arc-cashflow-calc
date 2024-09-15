@@ -125,7 +125,6 @@ function calcForecastTable() {
 
     let calc_roi_buyin = null;
     let calc_roi_buyin_inventory = null;
-    const total_inventory_cost = Number(initial_inventory_amount.value) + Number(secondary_inventory_amount.value);
     for(let i = 1; i <= 24; i++) {
         const month = i;
 
@@ -193,7 +192,7 @@ function calcForecastTable() {
             }
         }
 
-        if(m_cumulative >= Number(product.value) + total_inventory_cost) {
+        if(m_cumulative >= Number(product.value) + Number(initial_inventory_amount.value)) {
             if(!calc_roi_buyin_inventory) {
                 calc_roi_buyin_inventory = month;
             }
