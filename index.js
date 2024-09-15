@@ -192,7 +192,7 @@ function calcForecastTable() {
             }
         }
 
-        if(m_cumulative >= Number(product.value) + Number(initial_inventory_amount.value)) {
+        if(m_cumulative >= Number(product.value) + Number()) {
             if(!calc_roi_buyin_inventory) {
                 calc_roi_buyin_inventory = month;
             }
@@ -294,30 +294,24 @@ function calcSummaryTable() {
         "Operating Expenses"   : USDollar.format(operating_expenses),
         "Profit Split"         : USDollar.format(profit_split),
         "Net Profit"           : USDollar.format(net_profit),
-        "Next Inventory Order" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
+        "Next Inventory Purchase (if net profits were rolled into next purchase)" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
     };
 
     if(summary_grid) {
         summary_grid.destroy();
     }
 
-    let data_array = [
-        ["Revenue"],
-        ["Inventory Cost"],
-        ["Platform Fees"],
-        ["Gross Profit"],
-        ["Operating Expenses"],
-        ["Profit Split"],
-        ["Net Profit"],
-        ["Next Inventory Order"]
-    ];
+    let data_array = Object.keys(data).map((key) => [key]);
+    let table_columns = [{name: "", width: "500px"}];
 
     if(platform.value == "Walmart") {
+        table_columns.push("Month 1");
         for(const idx in data_array) {
             const key = data_array[idx][0];
             data_array[idx].push(data[key]);
         }
     } else {
+        table_columns.push("Month 0", "Month 1");
         data_array = [["Upfront Inventory Investment"], ...data_array]
         data_array[0].push(USDollar.format(initial_inventory_amount.value));
         for(const idx in data_array) {
@@ -328,7 +322,7 @@ function calcSummaryTable() {
     }
 
     summary_grid = new gridjs.Grid({
-        columns: platform.value == "Walmart" ? [{name: "", width: "200px"}, "Month 1"] : [{name: "", width: "200px"}, "Month 0", "Month 1"],
+        columns: table_columns,
         data: data_array,
         style: gridjs_styles
     }).render(document.getElementById('single-inventory-table'));
