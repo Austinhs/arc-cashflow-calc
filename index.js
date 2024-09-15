@@ -192,7 +192,7 @@ function calcForecastTable() {
             }
         }
 
-        if(m_cumulative >= Number(product.value) + Number()) {
+        if(m_cumulative >= Number(product.value) + Number(initial_inventory_amount.value)) {
             if(!calc_roi_buyin_inventory) {
                 calc_roi_buyin_inventory = month;
             }
@@ -215,7 +215,11 @@ function calcForecastTable() {
         if(!val) return "";
         return `${(val * 100).toFixed(2)}%`;
     }
+
+
+    const total_cost = Number(initial_inventory_amount.value) + Number(product.value);
     for(let i = 1; i <= 24; i++) {
+        const cumlative_color = cumulative[i] >= total_cost ? "#41dc8e" : "#FF7F7F";
         revenue[i]              = formatDollars(revenue[i]);
         platform_seller_fees[i] = formatDollars(platform_seller_fees[i]);
         cogs[i]                 = formatDollars(cogs[i]);
@@ -226,7 +230,7 @@ function calcForecastTable() {
         dedicated_staff[i]      = formatDollars(dedicated_staff[i]);
         net_profit[i]           = formatDollars(net_profit[i]);
         net_profit_percent[i]   = formatPercent(net_profit_percent[i]);
-        cumulative[i]           = formatDollars(cumulative[i]);
+        cumulative[i]           = gridjs.html(`<div style="color: ${cumlative_color}">${formatDollars(cumulative[i])}`);
     }
 
     if(forecast_grid) {
@@ -236,7 +240,33 @@ function calcForecastTable() {
     roi_buyin.innerHTML = calc_roi_buyin ? `Month ${calc_roi_buyin}` : "Cost not covered";
     roi_buyin_inventory.innerHTML = calc_roi_buyin_inventory ? `Month ${calc_roi_buyin_inventory}` : "Cost not covered";
     forecast_grid = new gridjs.Grid({
-        columns: [{name: "", width: "200px"}, "Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6", "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12", "Month 13", "Month 14", "Month 15", "Month 16", "Month 17", "Month 18", "Month 19", "Month 20", "Month 21", "Month 22", "Month 23", "Month 24"],
+        columns: [
+            {name: "", width: "200px"}, 
+            "Month 1",
+            "Month 2",
+            "Month 3",
+            "Month 4",
+            "Month 5",
+            "Month 6",
+            "Month 7",
+            "Month 8",
+            "Month 9",
+            "Month 10",
+            "Month 11",
+            "Month 12",
+            "Month 13",
+            "Month 14",
+            "Month 15",
+            "Month 16",
+            "Month 17",
+            "Month 18",
+            "Month 19",
+            "Month 20",
+            "Month 21",
+            "Month 22",
+            "Month 23",
+            "Month 24"
+        ],
         data: [
             revenue,
             platform_seller_fees,
