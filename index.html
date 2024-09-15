@@ -43,19 +43,6 @@
                                 <input type="number" class="initial-inventory-amount input" placeholder="10000">
                             </div>
                             <div class="cell field is-col-span-2">
-                                <label class="label">Target Gross Profit Margin</label>
-                                <div class="select">
-                                    <select class="margin">
-                                        <option>N/A</option>
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="15">15</option>
-                                        <option value="20">20</option>
-                                        <option value="25">25</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="cell field is-col-span-2">
                                 <label class="label">Secondary inventory amount</label>
                                 <input type="number" class="secondary-inventory-amount input" placeholder="10000">
                             </div>
@@ -100,46 +87,15 @@
                 <article class="message">
                     <div class="message-header">Single Inventory Sequence</div>
                     <div class="message-body">
-                        <div class="summary-table">
-                            <div class="summary-row">
-                                <div class="summary-headers">Sales</div>
-                                <div class="summary-values right-align" data-field="sales"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Inventory Costs</div>
-                                <div class="summary-values right-align" data-field="inventory_costs"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Platform Fees</div>
-                                <div class="summary-values right-align" data-field="platform_fees"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Operating Expenses</div>
-                                <div class="summary-values right-align" data-field="operating_expenses"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Gross Profit</div>
-                                <div class="summary-values right-align" data-field="gross_profit"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Profit Split</div>
-                                <div class="summary-values right-align" data-field="profit_split"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Net Profit</div>
-                                <div class="summary-values right-align" data-field="net_profit"></div>
-                            </div>
-                            <div class="summary-row">
-                                <div class="summary-headers">Next Inventory Order</div>
-                                <div class="summary-values right-align" data-field="next_inventory_order"></div>
-                            </div>
-                        </div>
+                        <div id="single-inventory-table"></div>
                     </div>
                 </article>
 
                 <article class="message">
                     <div class="message-header">24-month Forecast</div>
                     <div class="message-body">
+                        <div>ROI Timeline Buy-in: <strong class="roi_buyin"></strong></div>
+                        <div>ROI Timeline Buy-in + Inventory: <strong class="roi_buyin_inventory"></strong></div>
                         <div id="forecast-table"></div>
                     </div>
                 </article>

@@ -1,4 +1,4 @@
-let forecast_grid;
+let forecast_grid, summary_grid;
 
 // Report elements
 const run_button                 = document.querySelector('.run-report');
@@ -10,6 +10,8 @@ const initial_inventory_amount   = document.querySelector('.initial-inventory-am
 const margin                     = document.querySelector('.margin');
 const secondary_inventory_amount = document.querySelector('.secondary-inventory-amount');
 const month_start                = document.querySelector('.month-start');
+const roi_buyin                  = document.querySelector('.roi_buyin');
+const roi_buyin_inventory        = document.querySelector('.roi_buyin_inventory');
 let   product                    = document.querySelector('.product.active');
 
 run_button.addEventListener('click', run_report);
@@ -19,11 +21,31 @@ document.addEventListener('keydown', (e) => {
     if(e.key === 'Enter') {
         run_report();
     }
-})
+});
+
+const gridjs_styles = {
+    padding: "0px",
+    tbody: {
+        "background-color": "#14161a",
+    },
+    th: {
+        "background-color": "rgb(31, 34, 41)",
+        color: "#fff",
+        border: "1px solid #14161a",
+    },
+    td: {
+        "background-color": "rgb(51, 55, 64)",
+        color: "#fff",
+        border: "1px solid #14161a",
+    },
+};
 
 // TODO: Remove as this is for debugging purposes
 // initial_inventory_amount.value = 15000;
+// secondary_inventory_amount.value = 5000;
+// month_start.value = 12;
 // run_report();
+// window.scrollTo(0, document.body.scrollHeight);
 
 function platform_change() {
     const selected_platform = platform.value;
@@ -63,13 +85,17 @@ function run_report() {
     const report_result_el = document.querySelector('.report-results');
     const inventory_amount = Number(initial_inventory_amount.value);
 
-    if(inventory_amount <= 0) {
+    if(inventory_amount < 5000) {
         initial_inventory_amount.classList.add('has-error');
         initial_inventory_amount.focus();
-        alert('Initial inventory amount is required before you can calculate the report.');
+        alert('You must have an initial inventory amount of at least $5,000');
         return;
     } else {
         initial_inventory_amount.classList.remove('has-error');
+    }
+
+    if(!secondary_inventory_amount.value) {
+        secondary_inventory_amount.value = 0;
     }
 
     report_result_el.classList.add('active');
@@ -97,27 +123,121 @@ function calcForecastTable() {
     const net_profit_percent   = ["Net Profit %"];
     const cumulative           = ["Cumulative"];
 
-    for(let i = 0; i < 24; i++) {
-        const month = i + 1;
+    let calc_roi_buyin = null;
+    let calc_roi_buyin_inventory = null;
+    const total_inventory_cost = Number(initial_inventory_amount.value) + Number(secondary_inventory_amount.value);
+    for(let i = 1; i <= 24; i++) {
+        const month = i;
 
-        if(month != 1) {
-            revenue.push(revenue[month - 1] / .6);
-        } else {
-            revenue.push(initial_inventory_amount.value / .6);
+        let m_cogs = 0;
+        switch(month) {
+            case 1:
+                m_cogs = 1000;
+                break;
+            case 2:
+                m_cogs = 3000;
+                break;
+            case 3:
+                m_cogs = 5000;
+                break;
+            case 4:
+                m_cogs = Math.min(Number(initial_inventory_amount.value), 10000);
+                break;
+            default:
+                m_cogs = Number(initial_inventory_amount.value);
+                break;
+        }
+
+        if(month == month_start.value) {
+            m_cogs += Number(secondary_inventory_amount.value);
+        }
+
+        cogs[i] = m_cogs;
+
+        const m_revenue = Number(m_cogs / 0.6);
+        revenue[i] = m_revenue;
+
+        const m_platform_seller_fees = Number(m_revenue * 0.15);
+        platform_seller_fees[i] = m_platform_seller_fees;
+
+        const m_gross_profit = Number(m_revenue - m_platform_seller_fees - m_cogs);
+        gross_profit[i] = m_gross_profit;
+
+        const m_gp_margin = m_gross_profit / m_revenue;
+        gp_margin[i] = m_gp_margin;
+
+        const m_profit_split = Number(m_gross_profit * getProfitSplit());
+        profit_split[i] = m_profit_split;
+
+        const m_software = platform.value === 'Amazon' ? 250 : 130;
+        software[i] = m_software;
+
+        if(month >= 4) {
+            const m_dedicated_staff = Number(Math.max(Math.floor(m_revenue / 30000), 1) * 400);
+            dedicated_staff[i] = m_dedicated_staff;
+        }
+
+        const m_net_profit = Number(m_gross_profit - m_software - m_profit_split);
+        net_profit[i] = m_net_profit;
+
+        const m_net_profit_percent = Number(m_net_profit / m_revenue);
+        net_profit_percent[i] = m_net_profit_percent;
+
+        const prev_cumulative = cumulative.length == 1 ? 0 : cumulative[cumulative.length - 1];
+        const m_cumulative = Number(prev_cumulative) + Number(m_net_profit);
+        cumulative[i] = m_cumulative;
+
+        if(m_cumulative >= Number(product.value)) {
+            if(!calc_roi_buyin) {
+                calc_roi_buyin = month;
+            }
+        }
+
+        if(m_cumulative >= Number(product.value) + total_inventory_cost) {
+            if(!calc_roi_buyin_inventory) {
+                calc_roi_buyin_inventory = month;
+            }
         }
     }
 
-    // Format to Dollars
+    // Format
+    const formatDollars = (val) => {
+        if(!val) return "";
+        const dollar_amt = USDollar.format(val);
+        if(dollar_amt === "$NaN") {
+            console.error("Error formatting", val);
+            return "Error Formatting";
+        }
+
+        return dollar_amt;
+    }
+
+    const formatPercent = (val) => {
+        if(!val) return "";
+        return `${(val * 100).toFixed(2)}%`;
+    }
     for(let i = 1; i <= 24; i++) {
-        revenue[i] = USDollar.format(revenue[i]);
+        revenue[i]              = formatDollars(revenue[i]);
+        platform_seller_fees[i] = formatDollars(platform_seller_fees[i]);
+        cogs[i]                 = formatDollars(cogs[i]);
+        gross_profit[i]         = formatDollars(gross_profit[i]);
+        gp_margin[i]            = formatPercent(gp_margin[i]);
+        profit_split[i]         = formatDollars(profit_split[i]);
+        software[i]             = formatDollars(software[i]);
+        dedicated_staff[i]      = formatDollars(dedicated_staff[i]);
+        net_profit[i]           = formatDollars(net_profit[i]);
+        net_profit_percent[i]   = formatPercent(net_profit_percent[i]);
+        cumulative[i]           = formatDollars(cumulative[i]);
     }
 
     if(forecast_grid) {
         forecast_grid.destroy();
     }
 
+    roi_buyin.innerHTML = calc_roi_buyin ? `Month ${calc_roi_buyin}` : "Cost not covered";
+    roi_buyin_inventory.innerHTML = calc_roi_buyin_inventory ? `Month ${calc_roi_buyin_inventory}` : "Cost not covered";
     forecast_grid = new gridjs.Grid({
-        columns: [{name: "Variables", width: "200px"}, "Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6", "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12", "Month 13", "Month 14", "Month 15", "Month 16", "Month 17", "Month 18", "Month 19", "Month 20", "Month 21", "Month 22", "Month 23", "Month 24"],
+        columns: [{name: "", width: "200px"}, "Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6", "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12", "Month 13", "Month 14", "Month 15", "Month 16", "Month 17", "Month 18", "Month 19", "Month 20", "Month 21", "Month 22", "Month 23", "Month 24"],
         data: [
             revenue,
             platform_seller_fees,
@@ -131,22 +251,7 @@ function calcForecastTable() {
             net_profit_percent,
             cumulative
         ],
-        style: {
-            padding: "0px",
-            tbody: {
-                "background-color": "#14161a",
-            },
-            th: {
-                "background-color": "rgb(31, 34, 41)",
-                color: "#fff",
-                border: "1px solid #14161a",
-            },
-            td: {
-                "background-color": "rgb(51, 55, 64)",
-                color: "#fff",
-                border: "1px solid #14161a",
-            },
-        }
+        style: gridjs_styles
     }).render(document.getElementById('forecast-table'));
 }
 
@@ -176,26 +281,56 @@ function calcSummaryTable() {
     const software_cost        = platform.value === 'Amazon' ? 250 : 130;
     const revenue              = Number(initial_inventory_amount.value / .6);
     const platform_fees        = Number(revenue * platform_fee_percent);
+    const gross_profit         = Number(revenue - platform_fees - initial_inventory_amount.value);
     const operating_expenses   = Number((Math.max(Math.floor(revenue / 30000), 1)) * 400 + software_cost);
-    const gross_profit         = Number(revenue - platform_fees - initial_inventory_amount.value)
     const profit_split         = Number(gross_profit * getProfitSplit());
     const net_profit           = Number(gross_profit - operating_expenses - profit_split);
 
 
     const data = {
-        sales                : USDollar.format(revenue),
-        inventory_costs      : USDollar.format(initial_inventory_amount.value),
-        platform_fees        : USDollar.format(platform_fees),
-        operating_expenses   : USDollar.format(operating_expenses),
-        gross_profit         : USDollar.format(gross_profit),
-        profit_split         : USDollar.format(profit_split),
-        net_profit           : USDollar.format(net_profit),
-        next_inventory_order : USDollar.format(net_profit + Number(initial_inventory_amount.value))
+        "Revenue"              : USDollar.format(revenue),
+        "Inventory Cost"       : USDollar.format(initial_inventory_amount.value),
+        "Platform Fees"        : USDollar.format(platform_fees),
+        "Gross Profit"         : USDollar.format(gross_profit),
+        "Operating Expenses"   : USDollar.format(operating_expenses),
+        "Profit Split"         : USDollar.format(profit_split),
+        "Net Profit"           : USDollar.format(net_profit),
+        "Next Inventory Order" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
     };
 
-    const summary_values = document.querySelectorAll('.summary-values');
-    summary_values.forEach((el) => {
-        const field = el.getAttribute('data-field');
-        el.innerHTML = data[field];
-    });
+    if(summary_grid) {
+        summary_grid.destroy();
+    }
+
+    let data_array = [
+        ["Revenue"],
+        ["Inventory Cost"],
+        ["Platform Fees"],
+        ["Gross Profit"],
+        ["Operating Expenses"],
+        ["Profit Split"],
+        ["Net Profit"],
+        ["Next Inventory Order"]
+    ];
+
+    if(platform.value == "Walmart") {
+        for(const idx in data_array) {
+            const key = data_array[idx][0];
+            data_array[idx].push(data[key]);
+        }
+    } else {
+        data_array = [["Upfront Inventory Investment"], ...data_array]
+        data_array[0].push(USDollar.format(initial_inventory_amount.value));
+        for(const idx in data_array) {
+            const key = data_array[idx][0];
+            data_array[idx].push("");
+            data_array[idx].push(data[key]);
+        }
+    }
+
+    summary_grid = new gridjs.Grid({
+        columns: platform.value == "Walmart" ? [{name: "", width: "200px"}, "Month 1"] : [{name: "", width: "200px"}, "Month 0", "Month 1"],
+        data: data_array,
+        style: gridjs_styles
+    }).render(document.getElementById('single-inventory-table'));
 }
