@@ -45,10 +45,10 @@ const gridjs_styles = {
 };
 
 // TODO: Remove as this is for debugging purposes
-initial_inventory_amount.value = 15000;
-month_start.value = 12;
-run_report();
-window.scrollTo(0, document.body.scrollHeight);
+// initial_inventory_amount.value = 15000;
+// month_start.value = 12;
+// run_report();
+// window.scrollTo(0, document.body.scrollHeight);
 
 function platform_change() {
     const selected_platform = platform.value;
