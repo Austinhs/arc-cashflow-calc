@@ -23,6 +23,10 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+const USDollar = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});
 const gridjs_styles = {
     padding: "0px",
     tbody: {
@@ -105,11 +109,6 @@ function run_report() {
 }
 
 function calcForecastTable() {
-    const USDollar = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-    });
-
     // Forecast table values
     const revenue              = ["Revenue"];
     const platform_seller_fees = ["Platform Seller Fees"];
@@ -302,29 +301,11 @@ function getProfitSplit() {
 }
 
 function calcSummaryTable() {
-    const USDollar = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-    });
-    const platform_fee_percent = platform.value === 'Amazon' ? .15 : .15;
-    const software_cost        = platform.value === 'Amazon' ? 250 : 130;
     const revenue              = Number(initial_inventory_amount.value / .6);
-    const platform_fees        = Number(revenue * platform_fee_percent);
-    const gross_profit         = Number(revenue - platform_fees - initial_inventory_amount.value);
-    const operating_expenses   = Number((Math.max(Math.floor(revenue / 30000), 1)) * 400 + software_cost);
-    const profit_split         = Number(gross_profit * getProfitSplit());
-    const net_profit           = Number(gross_profit - operating_expenses - profit_split);
-
 
     const data = {
-        "Revenue"              : USDollar.format(revenue),
-        "Inventory Cost"       : USDollar.format(initial_inventory_amount.value),
-        "Platform Fees"        : USDollar.format(platform_fees),
-        "Gross Profit"         : USDollar.format(gross_profit),
-        "Operating Expenses"   : USDollar.format(operating_expenses),
-        "Profit Split"         : USDollar.format(profit_split),
-        "Net Profit"           : USDollar.format(net_profit),
-        "Next Inventory Purchase (if net profits were rolled into next purchase)" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
+        "Revenue" : USDollar.format(revenue),
+        ...calc_profit_from_revenue(revenue)
     };
 
     if(summary_grid) {
@@ -351,9 +332,52 @@ function calcSummaryTable() {
         }
     }
 
+    table_columns.push("Worst", "Best");
+    const calc_worst_data = calc_profit_from(data, 0.1);
+    const calc_best_data = calc_profit_from(data, 0.25);
+    for(const idx in data_array) {
+        const key = data_array[idx][0];
+        data_array[idx].push(calc_worst_data[key]);
+        data_array[idx].push(calc_best_data[key]);
+    }
+
     summary_grid = new gridjs.Grid({
         columns: table_columns,
         data: data_array,
         style: gridjs_styles
     }).render(document.getElementById('single-inventory-table'));
+}
+
+function calc_profit_from_revenue(revenue) {
+    const platform_fee_percent = platform.value === 'Amazon' ? .15 : .15;
+    const software_cost        = platform.value === 'Amazon' ? 250 : 130;
+    const platform_fees        = Number(revenue * platform_fee_percent);
+    const gross_profit         = Number(revenue - platform_fees - initial_inventory_amount.value);
+    const operating_expenses   = Number((Math.max(Math.floor(revenue / 30000), 1)) * 400 + software_cost);
+    const profit_split         = Number(gross_profit * getProfitSplit());
+    const net_profit           = Number(gross_profit - operating_expenses - profit_split);
+
+    return {
+        "Inventory Cost"       : USDollar.format(initial_inventory_amount.value),
+        "Platform Fees"        : USDollar.format(platform_fees),
+        "Gross Profit"         : USDollar.format(gross_profit),
+        "Operating Expenses"   : USDollar.format(operating_expenses),
+        "Profit Split"         : USDollar.format(profit_split),
+        "Net Profit"           : USDollar.format(net_profit),
+        "Next Inventory Purchase (if net profits were rolled into next purchase)" : USDollar.format(Math.max(net_profit + Number(initial_inventory_amount.value), 0))
+    };
+}
+
+function convertDollarToNumber(dollar) {
+    return parseFloat(dollar.replace(/[^0-9.-]+/g,""));
+}
+
+function calc_profit_from(prev_results, new_profit_percent) {
+    const prev_cost = convertDollarToNumber(prev_results["Profit Split"]) + convertDollarToNumber(prev_results["Operating Expenses"]);
+    const prev_revenue = convertDollarToNumber(prev_results["Revenue"]);
+    const prev_net_profit_percent = convertDollarToNumber(prev_results["Net Profit"]) / prev_revenue;
+    const prev_investment = Number(initial_inventory_amount.value);
+    const new_revenue = (prev_cost + prev_investment) / (1 - prev_net_profit_percent - new_profit_percent);
+
+    return { "Revenue": USDollar.format(new_revenue), ...calc_profit_from_revenue(new_revenue) };
 }
