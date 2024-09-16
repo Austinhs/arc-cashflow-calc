@@ -67,6 +67,18 @@
     justify-content: space-between;
 }
 
+/* GridJS styling */
+.gridjs-tr {
+    background-color: rgba(31, 34, 41, 1);
+}
+
+#forecast-table .gridjs-tr td:first-child, #forecast-table .gridjs-tr th:first-child {
+    background-color: rgba(31, 34, 41, .85) !important;
+    font-weight: bold;
+    position: sticky;
+    left: -1px;
+}
+
 /* Bulma styling */
 .select {
     width: 100%;
