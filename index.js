@@ -72,11 +72,11 @@ function product_change() {
     const selected_product = product.value;
 
     if(selected_platform == "Amazon") {
-        document.querySelector('.amazon').classList.add('active');
-        document.querySelector('.walmart').classList.remove('active');
+        document.querySelectorAll('.amazon').forEach(e => e.classList.add('active'));
+        document.querySelectorAll('.walmart').forEach(e => e.classList.remove('active'));
     } else {
-        document.querySelector('.walmart').classList.add('active');
-        document.querySelector('.amazon').classList.remove('active');
+        document.querySelectorAll('.walmart').forEach(e => e.classList.add('active'));
+        document.querySelectorAll('.amazon').forEach(e => e.classList.remove('active'));
     }
 
     if(selected_platform == "Amazon" && selected_product == "45000") {
